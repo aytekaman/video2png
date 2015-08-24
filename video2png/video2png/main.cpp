@@ -15,8 +15,6 @@ int main( int argc, char** argv )
 	CvCapture* capture = cvCreateFileCapture(argv[1]);
 	int length = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
 	//cout << length << endl;
-
-
 	char *imageData = new char[640*480*3];
 
 	int frameNumber = 0;
@@ -58,8 +56,6 @@ int main( int argc, char** argv )
 		w = size.width;
 		h = size.height;
 
-
-
 		// set filename
 		int i;
 		char buffer [33];
@@ -70,46 +66,47 @@ int main( int argc, char** argv )
 		outputFileName += "\\Frame_";
 		outputFileName.append(buffer);
 		string outputFileNamePNG = outputFileName + ".png";
+		string outputFileNameSIF = outputFileName + ".sif";
 
 		// save as png
-		imwrite(outputFileNamePNG, frame);
+		//imwrite(outputFileNamePNG, frame);
 
-		//// write using simple RGBRGBRGB... format
-		//for(int i = 0; i < h; i++)
-		//{
-		//	for(int j = 0; j < w; j++)
-		//	{
-		//		imageData[3 * ((h - i - 1) * w + j) + 0] = frame.data[3 * (i * w + j) + 2];
-		//		imageData[3 * ((h - i - 1) * w + j) + 1] = frame.data[3 * (i * w + j) + 1];
-		//		imageData[3 * ((h - i - 1) * w + j) + 2] = frame.data[3 * (i * w + j) + 0];
-		//	}
-		//}
+		// write using simple RGBRGBRGB... format
+		for(int i = 0; i < h; i++)
+		{
+			for(int j = 0; j < w; j++)
+			{
+				imageData[3 * ((h - i - 1) * w + j) + 0] = frame.data[3 * (i * w + j) + 2];
+				imageData[3 * ((h - i - 1) * w + j) + 1] = frame.data[3 * (i * w + j) + 1];
+				imageData[3 * ((h - i - 1) * w + j) + 2] = frame.data[3 * (i * w + j) + 0];
+			}
+		}
 
-		//ofstream outputFile;
-		//outputFile.open(outputFileName, ios::out | ios::binary);
-		//outputFile.write(imageData, w * h * 3);
-		//outputFile.close();
+		ofstream outputFile;
+		outputFile.open(outputFileNameSIF, ios::out | ios::binary);
+		outputFile.write(imageData, w * h * 3);
+		outputFile.close();
 
 		frameNumber++;
 
 		if(frameNumber % (length / 10) == 0)
-			cout << ". "; 
+			cout << ". ";
     }
 
 	
 
-	//// write info file
-	//string infoFileName = folderName;
-	//infoFileName += "\\info";
+	// write info file
+	string infoFileName = folderName;
+	infoFileName += "\\info.txt";
 
-	//ofstream infoFile;
-	//infoFile.open(infoFileName);
+	ofstream infoFile;
+	infoFile.open(infoFileName);
 
-	//infoFile << w << endl;
-	//infoFile << h << endl;
-	//infoFile << 24 << endl;
+	infoFile << w << endl;
+	infoFile << h << endl;
+	infoFile << 24 << endl;
 	
-	//infoFile.close();
+	infoFile.close();
 
     cvReleaseCapture(&capture);
     return 0;
